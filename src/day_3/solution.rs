@@ -19,6 +19,8 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
     let mut i = 0;
     let mut j = 0;
     let mut numbers: Vec<String> = Vec::new();
+    let mut final_numbers: Vec<u32> = Vec::new();
+    let mut count = 0;
     while i < schematic.len() {
         while j < schematic[i].len() {
             if schematic[i][j] == '.' {
@@ -26,6 +28,11 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                 continue;
             }
             if schematic[i][j].is_ascii_punctuation() {
+                if schematic[i][j] != '*' {
+                    j += 1;
+                    continue;
+                }
+                
                 let symbol = schematic[i][j];
                 // If we find a symbol we need to check the 8 surrounding squares
                 let x = i.clone();
@@ -41,6 +48,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     }
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -60,6 +68,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     }
                     if value != "" {
                         value = value.chars().rev().collect();
+                        count += 1;
                         println!("Found Value {} near Symbol {}", value, symbol);
                         numbers.push(value);
                     }
@@ -86,6 +95,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     value = format!("{}{}", left_hand_side, right_hand_side);
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -101,6 +111,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     }
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -122,6 +133,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     value = value.chars().rev().collect();
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -150,6 +162,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     value = format!("{}{}", left_hand_side, right_hand_side);
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -164,6 +177,7 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     }
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
@@ -185,18 +199,26 @@ fn read_file(path: &str) -> Result<u32, std::io::Error> {
                     value = value.chars().rev().collect();
                     if value != "" {
                         println!("Found Value {} near Symbol {}", value, symbol);
+                        count += 1;
                         numbers.push(value);
                     }
                 }
             }
+            if count == 2 {
+                let gear_total = numbers
+                    .iter()
+                    .fold(1, |acc, x| acc * x.parse::<u32>().unwrap());
+                final_numbers.push(gear_total);
+            }
+            numbers.clear();
+            count = 0;
             j += 1;
         }
         j = 0;
         i += 1;
     }
-    let total = numbers
-        .iter()
-        .fold(0, |acc, x| acc + x.parse::<u32>().unwrap());
+    println!("Final Numbers: {:?}", final_numbers);
+    let total = final_numbers.iter().sum();
     return Ok(total);
 }
 pub fn run() {
